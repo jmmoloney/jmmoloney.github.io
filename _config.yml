@@ -23,8 +23,9 @@ github_username:  jmmoloney
 
 hydeout:
   repo: "https://github.com/jmmoloney"
+  linkedin: "https://www.linkedin.com/in/jessicamoloney/"
 
-remote_theme: jmmoloney/hydeout
+remote_theme: jmmoloney/hydeout@new_icons
 # sass:
 #   sass_dir: assets
 
