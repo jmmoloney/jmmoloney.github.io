@@ -27,7 +27,7 @@ hydeout:
 
 remote_theme: jmmoloney/hydeout@profile_pic
 # sass:
-#   sass_dir: assets
+#   sass_dir: assets/css
 
 # Build settings
 markdown: kramdown
