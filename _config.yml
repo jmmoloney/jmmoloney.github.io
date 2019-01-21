@@ -25,7 +25,7 @@ hydeout:
   repo: "https://github.com/jmmoloney"
   linkedin: "https://www.linkedin.com/in/jessicamoloney/"
 
-remote_theme: jmmoloney/hydeout@profile_pic
+remote_theme: jmmoloney/hydeout@profile_pi
 # sass:
 #   sass_dir: assets/css
 
