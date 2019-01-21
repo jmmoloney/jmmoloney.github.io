@@ -27,8 +27,8 @@ hydeout:
 
 remote_theme: jmmoloney/hydeout #@new_icons
 
-sass:
-  sass_dir: assets/css
+# sass:
+#   sass_dir: assets/css
 
 # Build settings
 markdown: kramdown
