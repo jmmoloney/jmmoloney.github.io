@@ -3,9 +3,64 @@ layout: page
 title: Blog
 sidebar_sort_order: 200
 ---
-	<ul class="posts">
+<style>
 
+.line{
+	padding: 40px 10px 5px;
+	border-bottom:1px dashed black;
+	width: 30%;
+  margin: 10px auto;
+}
+.my-header h2 {
+  display: inline;
+}
+.my-header span {
+  float: right;
+}
+.post-link {
+	overflow: hidden;
+  padding: 10px 10px 10px 10px;
+	transition: .2s ease;
+	border-radius: 25px;
+}
+
+.post-link:hover {
+	background-color: #F0FFFF;
+  color: black;
+}
+
+.text{
+	color: #000000
+}
+.text:hover{
+	color: #000000;
+	text-decoration:none;
+	border: none;
+	box-shadow: none;
+}
+</style>
+
+	<ul class="posts">
+	<br>
 	  {% for post in site.posts %}
-	    <li> <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a> »  <span>{{ post.date | date_to_string }}</span></li>
+			<div class = "post-link">
+				<a href="{{ site.url }}{{ post.url }}">
+						<div class="my-header">
+								<h2>{{ post.title }}</h2>
+									<small>
+										<span style="float:right; color: #A9A9A9"> {{ post.date | date_to_string }}</span>
+									</small>
+							</div>
+	<br>
+			<div>
+				<span class ="text">{{ post.content | strip_html | truncatewords:50 }}</span>
+				<a href="{{ site.url }}{{ post.url }}">Read More.</a>
+			</div>
+			</a>
+			</div>
+			<body >
+				<div class="line"></div>
+			</body >
+
 	  {% endfor %}
 	</ul>
