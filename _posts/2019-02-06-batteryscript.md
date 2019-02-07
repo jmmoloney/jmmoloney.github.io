@@ -1,11 +1,10 @@
 ---
 layout: post
-title: Mac OS Low-Battery Script using AppleScript
+title: Custom Mac OS Low-Battery Notification using AppleScript
 comments: false
 ---
 
-For some time, I was bothered by the fact that I would not receive a low battery warning on my MacBook until the critical 5%. In a panic, I'd have to search furiously for A. my charger, and B. an outlet. I was surprised to find out that there wasn't a native way to change the options related to the warning, especially since other apple products would give warnings much earlier than 5%.
-
+For some time, I was bothered by the fact that I would not receive a low battery warning on my MacBook until the critical 5%. In a panic, I'd have to search furiously for A) my charger and B) an outlet. I was also surprised to find out that there wasn't a native way to change the options related to the warning, especially since other Apple products would give warnings much earlier than 5%. 
 
 Just over a year ago, I decided to look into creating my own notification script to solve this small annoyance and to alert me at a more reasonable percentage. I was actually able to get something working with the help of this link from lifehacker [here](https://www.lifehacker.com.au/2011/02/give-your-mac-a-more-attention-grabbing-low-battery-warning/).  
 
@@ -25,15 +24,16 @@ A year ago I was new to automation tasks, especially on Mac, and following the m
 You'll see that many of the lines in the completed AppleScript code actually use quite a bit of shell scripting and that the completed Bash version also calls on some AppleScript functionality (namely `osascript`). So, it really is dealer's choice here.
 
 
-## Launchd vs. Crontab
+## Launchd vs. Cron
 
+Cron is the traditional Linux "go-to" when it comes to script automation and scheduling. Although previously supported in Mac OS, it is now deprecated, with functionality being "absorbed" into Apple's launchd. You could still use either in this case; I've chosen Launchd for the same reason I chose AppleScript for this project.
 
 ## The Solution <a name="solution"></a>
 
 
 I've made a few tweaks to the original AppleScript file that I much prefer; the original script is much more obnoxious and turns the volume to 100% and continually shouts at you to find an outlet.
 
-Throughout this process, I've made a couple variations but the one I've settled on, will run in the background to check if your battery levels are below 20% and remind you every 10 minutes to plug in until you reach below 10%, in which case, it will remind you every 5 minutes to find and outlet.
+Throughout this process, I've made a couple variations but the one I've settled on, will run in the background to check if your battery levels are below 20% and remind you every 10 minutes to plug in until you reach below 10%, in which case, it will remind you every 5 minutes to find and outlet. (This script can be found in my [Github](https://github.com/jmmoloney/batteryscript/tree/master/applescript) with `...keepRunning...` in the filename.)
 
 There shouldn't be too much battery drain from this running process, but if I do notice anything, I may revert to a less frequent check than this one. See the [notes](#notes) for tips on doing that.
 
@@ -42,7 +42,7 @@ Script Editor is an application that should already exist on your Mac. Open that
 
 ```applescript
 set Cap to (do shell script "ioreg -w0 -l | grep ExternalChargeCapable")tell Cap to set {wallPower} to {last word of paragraph 1}if wallPower = "Yes" then	return 0else	set Pct to (do shell script "pmset -g batt | grep -Eo \"\\d+%\" | cut -d% -f1")	if Pct > 10 and Pct ≤ 20 then		display notification "Less than 20% Battery Remaining, plug in soon." with title "Low Battery" sound name "Basso"
-		delay 600	end if	if Pct ≤ 10 then		display notification "Less than 10% Battery, plug in now." with title "Critical Battery" sound name "Sosumi"
+		delay 600	else if Pct ≤ 10 then		display notification "Less than 10% Battery, plug in now." with title "Critical Battery" sound name "Sosumi"
 		delay 300	end ifend if
 
 ```
@@ -56,7 +56,7 @@ chmod +x /path/to/file/batteryScript.scpt
 **Note:** you can also save the file as a bundle or app, this increases the size (slightly), may require some changes in the plist file (later) and apps generally take a bit longer to load and run.
 
 ### Step Three: Write your .plist file
-As mentioned earlier, `.plist` files are ......
+A `.plist` file is a 'property list' file that contains the information about you daemon or agent in order to process the requests. The variables set here actually help you launch your agent and get your process running.
 
 Copy and paste the following into your favourite text editor and save as `batteryAlert.plist`. Then copy the file into your `~/Library/LaunchAgents` directory.
 
@@ -86,16 +86,57 @@ Copy and paste the following into your favourite text editor and save as `batter
 Depending on whether you want your script to be available to all users of your computer, or limited to just your profile, you will have to save the `.plist` file in one of two places. Briefly, if you want your script to run as root (for all users) you should place this file in `/Library/LaunchDaemons` instead.
 
 ### Step Four: Load your script
+In order to load your script (and get it to start running), run the following command in your terminal.
 
-## The Conclusion
+```bash
+launchctl load ~/Library/LaunchAgents/batteryAlert.plist
+```
 
-conclusion:
-If you're anything like me, the time can get away from you, and before you know it, you're at critically low battery levels.
+Your process should now be ready to go. 
 
-Most of my issues were not actually due to the choice of language but it was that I didn't quite know what my issues were. I spent far too many hours going down some pretty unrelated roads to arrive at the answers I have, but hey, I guess I got to learn some things out of it.
+We can check that all is well with the following command.
 
-## Notes <a name="notes"></a>
+```bash
+launchctl list | grep batteryAlert 
+```
+We should see an exit code of 0 in the second column, as well as a process ID in the first column if the process is currently running. 
+Don't panic if there is no ID just yet, it is more important that the exit code is 0 and will receive an ID when it is actually running. 
+
+<p align = "center">
+	<a href ="https://raw.githubusercontent.com/jmmoloney/batteryscript/master/screenshots/batteryScript_loadSuccess.png" target="_blank">
+		<img src="https://raw.githubusercontent.com/jmmoloney/batteryscript/master/screenshots/batteryScript_loadSuccess.png"/>
+	</a>
+</p>      
+If you ever need to unload or reload your `.plist`, run the following and then run the load command again. This prevents you from having to restart to see changes (which many tutorials may suggest).
+
+```bash
+launchctl unload ~/Library/LaunchAgents/batteryAlert.plist`
+```
+ 
+
+## The Result
+
+Well that's it! Your script should be up and running and display low-battery notifications as shown below.
+
+If you're anything like me, the time can get away from you, and before you know it, you're at critically low battery levels. Hopefully, this script will help you out a bit with that.
+
+The files used in this post are also available on my [GitHub](https://github.com/jmmoloney/batteryscript).
+
+<p align="center">
+	<a href= "https://raw.githubusercontent.com/jmmoloney/batteryscript/master/screenshots/20_batteryWarning.png" target="_blank">
+		<img src="https://raw.githubusercontent.com/jmmoloney/batteryscript/master/screenshots/20_batteryWarning.png"/>
+	</a>
+</p>
+<p align="center">
+	<a href= "https://raw.githubusercontent.com/jmmoloney/batteryscript/master/screenshots/10_batteryWarning.png" target="_blank">
+		<img src="https://raw.githubusercontent.com/jmmoloney/batteryscript/master/screenshots/10_batteryWarning.png"/>
+	</a>
+</p>
+
 ___
+___
+
+## Notes 
 
 A few configurable things to note:
 
@@ -106,6 +147,8 @@ A few configurable things to note:
      <key>StartInterval</key>
      <integer>600</integer>
    ```
+I've already written some of the variations you could do. They're all available on my Github, linked below.
+<a name="notes"></a>
 
 **If you've followed the instructions of the original article posted above, there are two main things to change in order to get your script running.**
 
@@ -114,6 +157,15 @@ A few configurable things to note:
    ```applescript
    set Pct to (do shell script "pmset -g batt | grep -Eo \"\\d+%\" | cut -d% -f1")
 ```
-2. Simply making the `.applescript` file executable within my `/etc/` folder didn't actually make my script work. I needed to export the compiled script from ScriptEditor as a Script (`.scpt`™) (Or as I later learned, as a ScriptBundle(`.scptd`) or Application(`.app`) works too). This may have been obvious to some, but was certainly not clear to me.
+2. Simply making the `.applescript` file executable within my `/etc/` folder didn't actually make my script work. I needed to export the compiled script from ScriptEditor as a Script (`.scpt`) (Or as I later learned, as a ScriptBundle(`.scptd`) or Application(`.app`) works too). This may have been obvious to some, but was certainly not clear to me.
 
 These two things, *should* allow for your script to run just fine.
+
+___
+
+## Additional Resources
+
+* [My Github BatteryScript Repo](https://github.com/jmmoloney/batteryscript)
+* [Original Battery Notification How-To](https://www.lifehacker.com.au/2011/02/give-your-mac-a-more-attention-grabbing-low-battery-warning/)
+* [Unofficial Launchd Guide](http://www.launchd.info/)
+* [Official Launchd Documentation](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html)
