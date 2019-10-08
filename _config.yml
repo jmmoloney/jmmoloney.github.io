@@ -27,6 +27,7 @@ hydeout:
   linkedin: "https://www.linkedin.com/in/jessicamoloney/"
 
 remote_theme: jmmoloney/hydeout@profile_pic
+#remote_theme: jmmoloney/hydeout@gh-pages
 # sass:
 #   sass_dir: assets/css
 
