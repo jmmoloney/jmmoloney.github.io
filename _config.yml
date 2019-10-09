@@ -22,6 +22,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jmmoloney.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  jmmoloney
 
+google_analytics: UA-134160619-1
 hydeout:
   repo: "https://github.com/jmmoloney"
   linkedin: "https://www.linkedin.com/in/jessicamoloney/"
