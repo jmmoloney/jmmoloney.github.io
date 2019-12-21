@@ -7,8 +7,18 @@ sidebar_sort_order: 100
 <style>
 .img-circle {
     border-radius: 50%;
+    display: block;
 }
 </style>
+
+<style>
+@media (max-width:629px) {
+  img#pic {
+    display: none;
+  }
+}
+</style>
+
 <!-- <style>
 img {
   border: 1px solid #ddd;
@@ -17,14 +27,22 @@ img {
   width: 300px;
 }
 </style> -->
+
 <body>
   <br/>
   <a id="profile-pic"
      href="{{ site.baseurl }}/assets/images/profile_laugh_copy.jpg"
      target="_blank">
-    <img src="{{ site.baseurl }}/assets/images/profile_laugh_copy.jpg" alt="profile"
-         height="300" width="270" align="right" class="img-circle"/>
+
+    <img id="pic" src="{{ site.baseurl }}/assets/images/profile_laugh_copy.jpg" alt="profile"
+         srcset='{{ site.baseurl }}/assets/images/profile_laugh_copy.jpg 1x,
+                {{ site.baseurl }}/assets/images/profile_laugh_copy.jpeg 2x'
+         style='max-width: 500px'
+         height="300" width="270" align=right class="img-circle"/>
+
   </a>
+
+
   Based in Toronto, Canada I'm currently working in the field of Data and Decision Sciences.
   I hold a BMath in Statistics and a MSc in Computer Science. I like to make the field of data
   science more accessible and understood by those around me.
